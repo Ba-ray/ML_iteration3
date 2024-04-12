@@ -62,20 +62,28 @@ def logging_csv(number, mode, landmark_list):
 
  
 
+d = {0:"up",1:"right",2:"left",3:"down"}
 
-def perform_actions(value):
-    def press_key(key):
-        pyautogui.press(key)
-        print(f"Performed {key} action")
 
-    if value == 0:
-        threading.Thread(target=press_key, args=('d',)).start()
-    elif value == 1:
-        threading.Thread(target=press_key, args=('a',)).start()
-    elif value == 2:
-        threading.Thread(target=press_key, args=('w',)).start()
-    elif value == 3:
-        threading.Thread(target=press_key, args=('s',)).start()
+def perform_action_with_delay(value, delay):
+    def perform_action():
+        # Perform action after delay
+        time.sleep(delay)
+        if value == 0:
+            pyautogui.press('w')
+            print("Performed 'w' action")
+        elif value == 1:
+            pyautogui.press('d')
+            print("Performed 'd' action")
+        elif value == 2:
+            pyautogui.press('a')
+            print("Performed 'a' action")
+        elif value == 3:
+            pyautogui.press('s')
+            print("Performed 's' action")
+
+    # Start a new thread for performing the action
+    threading.Thread(target=perform_action).start()
 
 #
 # Camera preparation ###############################################################
@@ -96,7 +104,6 @@ keypoint_classifier = KeyPointClassifier()
 
 mode =0
 number = -1
-d = {0:"open",1:"close",2:"peace",3:"spiderman"}
 while True:
     # Process Key (ESC: end) #################################################
     key = cv.waitKey(10)
@@ -139,10 +146,9 @@ while True:
 
             hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
 
-            perform_actions(hand_sign_id)
+            perform_action_with_delay(hand_sign_id, 0.05)
 
     cv.imshow('Hand Gesture Recognition', debug_image)
 
 cap.release()
 cv.destroyAllWindows()
-
