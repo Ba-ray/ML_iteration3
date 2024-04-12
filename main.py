@@ -14,10 +14,9 @@ def calc_landmark_list(image, landmarks):
     landmark_point = []
 
     # Keypoint
-    for _, landmark in enumerate(landmarks.landmark):
+    for landmark in landmarks.landmark:
         landmark_x = min(int(landmark.x * image_width), image_width - 1)
         landmark_y = min(int(landmark.y * image_height), image_height - 1)
-        # not taking z coordinates
 
         landmark_point.append([landmark_x, landmark_y])
 
@@ -42,10 +41,10 @@ def pre_process_landmark(landmark_list):
     # Normalization
     max_value = max(list(map(abs, temp_landmark_list)))
 
-    def normalize_(n):
+    def normalize(n):
         return n / max_value
 
-    temp_landmark_list = list(map(normalize_, temp_landmark_list))
+    temp_landmark_list = list(map(normalize, temp_landmark_list))
 
     return temp_landmark_list
 
@@ -84,13 +83,12 @@ def perform_action_with_delay(value, delay):
     # Start a new thread for performing the action
     threading.Thread(target=perform_action).start()
 
-#
-# Camera preparation ###############################################################
+# Camera preparation
 cap = cv.VideoCapture(0)
 cap.set(cv.CAP_PROP_FRAME_WIDTH, 960)
 cap.set(cv.CAP_PROP_FRAME_HEIGHT, 540)
 
-# Model load #############################################################
+# Model load
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(
     static_image_mode='store_true',
@@ -131,7 +129,7 @@ while True:
     image.flags.writeable = True
 
     if results.multi_hand_landmarks:
-        for hand_landmarks, handedness in zip(results.multi_hand_landmarks, results.multi_handedness):
+        for hand_landmarks in results.multi_hand_landmarks:
             
             # Landmark calculation
             landmark_list = calc_landmark_list(debug_image, hand_landmarks)
@@ -139,7 +137,6 @@ while True:
             # Conversion to relative coordinates / normalized coordinates
             pre_processed_landmark_list = pre_process_landmark(landmark_list)
 
-            # print(pre_processed_landmark_list)
             # Write to the dataset file
             logging_csv(number,mode,pre_processed_landmark_list)
 
