@@ -12,6 +12,6 @@ python main.py
 
 ## Team Members:
 
-Bechara El Helou
-Georges Faysal
+Bechara El Helou\
+Georges Faysal\
 Ray Bou Assy
