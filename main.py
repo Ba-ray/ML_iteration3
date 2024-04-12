@@ -1,5 +1,4 @@
 import cv2 as cv
-import numpy as np
 import mediapipe as mp
 import copy
 import itertools
@@ -105,7 +104,7 @@ keypoint_classifier = KeyPointClassifier()
 mode =0
 number = -1
 while True:
-    # Process Key (ESC: end) #################################################
+    # Process Keys
     key = cv.waitKey(10)
     if key == 27:  # ESC
         break
@@ -117,14 +116,14 @@ while True:
     if key == 110:  # n
         mode = 0
 
-    # Camera capture #####################################################
+    # Camera capture
     ret, image = cap.read()
     if not ret:
         break
     image = cv.flip(image, 1)  # Mirror display
     debug_image = copy.deepcopy(image)
 
-    # Detection implementation #############################################################
+    # Detection implementation
     image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
 
     image.flags.writeable = False
