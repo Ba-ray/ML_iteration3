@@ -58,37 +58,43 @@ def logging_csv(number, mode, landmark_list):
             writer = csv.writer(f)
             writer.writerow([number, *landmark_list])
 
- 
+
 
 d = {0:"up",1:"right",2:"left",3:"down"}
 
 
-def perform_action_with_delay(value, delay):
+def perform_action_with_delay(value, delay,prev_sign):
     def perform_action():
         # Perform action after delay
         time.sleep(delay)
-        if value == 0:
-            pyautogui.press('w')
-            print("Performed 'w' action")
-        elif value == 1:
-            pyautogui.press('d')
-            print("Performed 'd' action")
-        elif value == 2:
-            pyautogui.press('a')
-            print("Performed 'a' action")
-        elif value == 3:
-            pyautogui.press('s')
-            print("Performed 's' action")
+        if value == 0 and prev_sign == 0:
+            pyautogui.press('up')
+            print("Performed up' action")
+        elif value == 1 and prev_sign == 1:
+            pyautogui.press('right')
+            print("Performed 'right' action")
+        elif value == 2 and prev_sign == 2:
+            pyautogui.press('left')
+            print("Performed 'left' action")
+        elif value == 3 and prev_sign == 3:
+            pyautogui.press('down')
+            print("Performed 'down' action")
 
     # Start a new thread for performing the action
     threading.Thread(target=perform_action).start()
+
+
+def draw_landmarks(image, landmarks):
+    for idx, landmark in enumerate(landmarks):
+        x, y = landmark[0], landmark[1]
+        cv.circle(image, (x, y), 5, (0, 255, 0), -1)
+        cv.putText(image, str(idx), (x + 10, y), cv.FONT_HERSHEY_SIMPLEX, 0.4  , (255, 255, 255), 2)
 
 # Camera preparation
 cap = cv.VideoCapture(0)
 cap.set(cv.CAP_PROP_FRAME_WIDTH, 960)
 cap.set(cv.CAP_PROP_FRAME_HEIGHT, 540)
 
-# Model load
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(
     static_image_mode='store_true',
@@ -97,21 +103,25 @@ hands = mp_hands.Hands(
     min_tracking_confidence=0.5,
 )
 
+# Model load
 keypoint_classifier = KeyPointClassifier()
 
-mode =0
+mode = 0
 number = -1
+
+prev_sign = 0
+
 while True:
     # Process Keys
     key = cv.waitKey(10)
     if key == 27:  # ESC
         break
 
-    if 48 <= key <= 57:  # 0 ~ 9
+    if 48 <= key <= 57:  #0-9
         number = key - 48
         mode = 1
     
-    if key == 110:  # n
+    if key == 110:  #n
         mode = 0
 
     # Camera capture
@@ -134,6 +144,8 @@ while True:
             # Landmark calculation
             landmark_list = calc_landmark_list(debug_image, hand_landmarks)
 
+            # draw_landmarks(debug_image, landmark_list)
+
             # Conversion to relative coordinates / normalized coordinates
             pre_processed_landmark_list = pre_process_landmark(landmark_list)
 
@@ -142,7 +154,9 @@ while True:
 
             hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
 
-            perform_action_with_delay(hand_sign_id, 0.05)
+            perform_action_with_delay(hand_sign_id, 0.05, prev_sign)
+            
+            prev_sign = hand_sign_id
 
     cv.imshow('Hand Gesture Recognition', debug_image)
 
