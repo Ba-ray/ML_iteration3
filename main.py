@@ -82,6 +82,7 @@ def perform_action_with_delay(value, delay,prev_sign):
 
     # Start a new thread for performing the action
     threading.Thread(target=perform_action).start()
+    return value
 
 
 def draw_landmarks(image, landmarks):
@@ -154,10 +155,8 @@ while True:
 
             hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
 
-            perform_action_with_delay(hand_sign_id, 0.05, prev_sign)
+            prev_sign = perform_action_with_delay(hand_sign_id, 0.05, prev_sign)
             
-            prev_sign = hand_sign_id
-
     cv.imshow('Hand Gesture Recognition', debug_image)
 
 cap.release()
