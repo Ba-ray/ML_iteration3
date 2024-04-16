@@ -60,25 +60,27 @@ def logging_csv(number, mode, landmark_list):
 
 
 
-d = {0:"up",1:"right",2:"left",3:"down"}
+d = {0:"up",1:"right",2:"left",3:"down",4:"me"}
 
 
 def perform_action_with_delay(value, delay,prev_sign):
     def perform_action():
         # Perform action after delay
-        time.sleep(delay)
+        # time.sleep(delay)
         if value == 0 and prev_sign == 0:
             pyautogui.press('up')
-            print("Performed up' action")
+            # print("Performed up' action")
         elif value == 1 and prev_sign == 1:
             pyautogui.press('right')
-            print("Performed 'right' action")
+            # print("Performed 'right' action")
         elif value == 2 and prev_sign == 2:
             pyautogui.press('left')
-            print("Performed 'left' action")
+            # print("Performed 'left' action")
         elif value == 3 and prev_sign == 3:
             pyautogui.press('down')
-            print("Performed 'down' action")
+            # print("Performed 'down' action")
+        else:
+            print("No Action")
 
     # Start a new thread for performing the action
     threading.Thread(target=perform_action).start()
@@ -155,7 +157,9 @@ while True:
 
             hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
 
-            prev_sign = perform_action_with_delay(hand_sign_id, 0.05, prev_sign)
+            # print(d[hand_sign_id])
+
+            prev_sign = perform_action_with_delay(hand_sign_id, 0.00, prev_sign)
             
     cv.imshow('Hand Gesture Recognition', debug_image)
 
